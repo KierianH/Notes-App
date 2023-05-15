@@ -37,17 +37,17 @@ jobs:
         run: dotnet publish -c Release --self-contained true -r osx-arm64 --output ./Release/macos-arm64 --framework net7.0 /p:PublishSingleFile=true /p:PublishTrimmed=true
 
       - name: Remove Existing Zip Directories
-        run: rm -rf ./Notes/Releases/*.zip
+        run: rm -rf ./Notes/Release/*.zip
 
       - name: Zip Directories
         run: |
-          cd ./Notes/Releases
+          cd ./Notes/Release
           find . -type d -exec zip -r {}.zip {} \;
           cd ../..
 
-      - name: Update Releases
+      - name: Update Release
         uses: actions/upload-release-asset@v1
         with:
-          asset_path: ./Notes/Releases/**/*.zip
+          asset_path: ./Notes/Release/**/*.zip
           name: Release Asset
           tag_name: ${{ github.ref }}

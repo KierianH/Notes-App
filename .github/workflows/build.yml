@@ -42,9 +42,3 @@ jobs:
           find . -type d -exec zip -r {}.zip {} \;
           cd ..
 
-      - name: Update Releases
-        uses: actions/upload-release-asset@v1
-        with:
-          asset_path: ./Notes/Release/*.zip
-          name: Release Asset
-          tag_name: ${{ github.ref }}  

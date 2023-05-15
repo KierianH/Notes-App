@@ -61,7 +61,7 @@ jobs:
       - name: Update Release
         uses: actions/upload-release-asset@v1
         with:
-          asset_path: ./Notes/Release/**/*.zip
+          asset_path: ./Notes/Release/*.zip
           asset_name: ${{ github.run_number }}.zip
           asset_content_type: application/zip
           upload_url: ${{ steps.get_releases.outputs.upload_url }} 

@@ -57,6 +57,9 @@ jobs:
             console.log(response.data[0].upload_url);
             core.setOutput("upload_url", response.data[0].upload_url)
 
+      - name: Debug Release Directory
+        run: ls -R ./Notes/Release
+            
       - name: Update Releases
         id: update_releases
         uses: actions/upload-release-asset@v1

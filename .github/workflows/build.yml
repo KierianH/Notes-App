@@ -69,34 +69,5 @@ jobs:
               --data-binary "@$file" \
               "${{ steps.get_releases.outputs.upload_url }}?name=$file"
           done
-In this modified workflow:
-
-The Zip Directories step remains the same, creating individual zip files for each directory in ./Notes/Release.
-The Upload Release Assets step has been added to upload each zip file individually using the curl command and the GitHub API.
-The curl command sends a separate HTTP POST request for each zip file, using the secrets.GITHUB_TOKEN for authentication.
-Please note that this approach uses the curl command-line tool to perform the upload manually. You may need to install curl if it is not available by default in your GitHub Actions environment.
-
-Make sure to adjust the workflow according to your needs, and test it thoroughly to ensure it meets your requirements.
-
-
-
-
-
-User
-what is the secrets.Github_token?
-ChatGPT
-secrets.GITHUB_TOKEN is a secret token provided by GitHub Actions that authenticates the workflow run and allows access to the repository and its resources. It is automatically generated and available as an environment variable within the workflow.
-
-The secrets.GITHUB_TOKEN is a special token that grants limited permissions to perform actions within the repository, such as creating releases, adding release assets, commenting on pull requests, etc. It is scoped to the repository and can only be used within the context of the workflow.
-
-When using the secrets.GITHUB_TOKEN, you don't need to explicitly provide any authentication information or tokens. GitHub automatically injects and manages the token for you.
-
-In the provided example, the secrets.GITHUB_TOKEN is used in the Upload Release Assets step to authenticate the curl command and allow the upload of release assets to the GitHub release.
-
-Please note that the secrets.GITHUB_TOKEN is automatically generated and managed by GitHub. It is a secure way to authenticate actions within the workflow without exposing any sensitive credentials.
-
-
-
-
 
 

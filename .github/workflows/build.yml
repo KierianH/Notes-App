@@ -58,7 +58,6 @@ jobs:
             core.setOutput("upload_url", response.data[0].upload_url)
 
       - name: Update Releases
-        run: echo Notes/Release/*.zip
         id: update_releases
         uses: sekwah41/upload-release-assets@v1
         with:

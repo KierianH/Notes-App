@@ -60,7 +60,7 @@ jobs:
       - name: Update Releases
         run: echo Notes/Release/*.zip
         id: update_releases
-        uses: actions/upload-release-asset@v1
+        uses: sekwah41/upload-release-assets@v1
         with:
           asset_path: ./Notes/Release/*.zip  
           asset_name: ${{ github.run_number }}.zip

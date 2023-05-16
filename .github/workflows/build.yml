@@ -66,37 +66,4 @@ jobs:
           asset_name: ${{ github.run_number }}.zip
           asset_content_type: application/zip
           upload_url: ${{ steps.get_releases.outputs.upload_url }}
-In
-
-
-
-
-
-User
-do you see an error here?       - name: Debug Release Directory
-          run: ls ./Notes/Release
-
-      - name: Update Release
-        uses: actions/upload-release-asset@v1
-        with:
-          asset_path: ./Notes/Release/*.zip
-          asset_name: ${{ github.run_number }}.zip
-          asset_content_type: application/zip
-          upload_url: ${{ steps.get_releases.outputs.upload_url }} 
-          tag_name: ${{ github.ref }}
-ChatGPT
-Based on the provided code snippet, there doesn't seem to be any error. The "Debug Release Directory" step is using the ls command to list the files in the ./Notes/Release directory, which can help verify the existence of the zip files.
-
-The "Update Release" step is using the actions/upload-release-asset@v1 action to upload the zip files to the release. It includes the necessary inputs such as asset_path, asset_name, asset_content_type, upload_url, and tag_name.
-
-However, please ensure that the ./Notes/Release directory contains the expected zip files before running the workflow. If the ls command doesn't list any files or if the ./Notes/Release/*.zip pattern doesn't match any files, it could indicate an issue with the previous steps or the location of the zip files.
-
-Make sure that the dotnet publish commands are generating the zip files correctly and placing them in the ./Notes/Release directory. Also, double-check the directory structure and adjust the path if necessary.
-
-If you encounter any specific errors or issues, please provide the error messages or additional details for further assistance.
-
-
-
-
-
 

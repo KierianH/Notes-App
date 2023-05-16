@@ -59,7 +59,7 @@ jobs:
             core.setOutput("upload_url", response.data[0].upload_url)
 
       - name: Debug Release Directory
-          run: ls -R ./Notes/Release
+          run: ls ./Notes/Release
 
       - name: Update Release
         uses: actions/upload-release-asset@v1

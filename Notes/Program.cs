@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Linq;
 using Newtonsoft.Json;
 
-class Program
+namespace Notes;
+
+static class Program
 {
 
-    private static string defaultEditor = "nvim";
-    private static string configFilePath = Path.Combine(
+    private static string _defaultEditor = "nvim";
+    private static readonly string ConfigFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         ".notesconfig.json"
     );
@@ -20,6 +19,9 @@ class Program
             Console.WriteLine("Please provide the filename as the first argument.");
             return;
         }
+        var homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var notesPath = Path.Combine(homePath, "notes");
+        var filePath = Path.Combine(notesPath, args[0]);
 
         if (args[0] == "--editor")
         {
@@ -30,37 +32,55 @@ class Program
             }
 
             var config = new { Editor = args[1] };
-            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(config));
+            File.WriteAllText(ConfigFilePath, JsonConvert.SerializeObject(config));
             Console.WriteLine($"Default editor has been set to: {args[1]}");
             return;
         }
 
-        if (File.Exists(configFilePath))
+        
+        if (args[0] == "ls")
         {
-            var config = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(configFilePath));
-            defaultEditor = config.Editor;
+            ListNotes(notesPath);
+            return;
+        }
+        if (args[0] == "update")
+        {
+            SyncWithGit(notesPath, pullOnly: true);
+            Console.WriteLine("Notes updated from remote repository.");
+            return;
+        }
+        if (args[0] == "--origin")
+        {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Please specify the URL of the remote repository.");
+                return;
+            }
+
+            SetOrigin(notesPath, args[1]);
+            Console.WriteLine($"Origin has been set to: {args[1]}");
+            return;
+        }
+        if (File.Exists(ConfigFilePath))
+        {
+            var config = JsonConvert.DeserializeObject<dynamic>(File.ReadAllText(ConfigFilePath));
+            _defaultEditor = config!.Editor;
         }
 
-        var homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var notesPath = Path.Combine(homePath, "notes");
-        var filePath = Path.Combine(notesPath, args[0]);
 
         if (!Directory.Exists(notesPath))
         {
             Directory.CreateDirectory(notesPath);
         }
-
         if (!File.Exists(filePath))
         {
             File.Create(filePath).Dispose();
         }
-
         // Pull the latest changes before opening the file
         SyncWithGit(notesPath, pullOnly: true);
 
-        OpenFileInEditor(filePath, defaultEditor);
+        OpenFileInEditor(filePath, _defaultEditor);
 
-        // Push the changes after closing the file
         SyncWithGit(notesPath, pullOnly: false);
         
     }
@@ -75,7 +95,13 @@ class Program
         };
 
         using var process = Process.Start(startInfo);
-        process.WaitForExit();
+        if (process != null) 
+            process.WaitForExit();
+    }
+    private static void SetOrigin(string directoryPath, string remoteUrl)
+    {
+        RunCommand(directoryPath, "git", "init");
+        RunCommand(directoryPath, "git", $"remote add origin {remoteUrl}");
     }
 
     private static bool ValidateGitSettings(string directoryPath)
@@ -84,7 +110,7 @@ class Program
         if (!output.Contains("origin"))
         {
             Console.WriteLine("Remote 'origin' is not set. Please enter the URL of the remote repository:");
-            string remoteUrl = Console.ReadLine();
+            string? remoteUrl = Console.ReadLine();
             RunCommand(directoryPath, "git", $"remote add origin {remoteUrl}");
         }
 
@@ -102,6 +128,7 @@ class Program
     {
         RunCommand(directoryPath, "git", "init");
 
+        
         if (pullOnly)
         {
             if (ValidateGitSettings(directoryPath))
@@ -120,7 +147,26 @@ class Program
             }
         }
     }
+    private static void ListNotes(string directoryPath)
+    {
+        if (!Directory.Exists(directoryPath))
+        {
+            Console.WriteLine("No notes directory found.");
+            return;
+        }
 
+        var files = Directory.GetFiles(directoryPath);
+        if (files.Length == 0)
+        {
+            Console.WriteLine("No notes found.");
+            return;
+        }
+
+        foreach (var file in files.Select(Path.GetFileName))
+        {
+            Console.WriteLine(file);
+        }
+    }
     private static string RunCommand(string workingDirectory, string command, string arguments)
     {
         var startInfo = new ProcessStartInfo
